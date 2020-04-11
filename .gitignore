@@ -1,0 +1,5 @@
+target
+.idea
+*.xml
+test-output
+.DS_Store
