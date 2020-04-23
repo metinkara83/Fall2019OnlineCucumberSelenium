@@ -1,7 +1,6 @@
 package com.vytrack.pages.activities;
 
-import com.vytrack.pages.AbstractPageBase;
-import com.vytrack.utilities.BrowserUtilities;
+
 import com.vytrack.pages.AbstractPageBase;
 import com.vytrack.utilities.BrowserUtilities;
 import org.openqa.selenium.By;
@@ -41,34 +40,42 @@ public class CalendarEventsPage extends AbstractPageBase {
     @FindBy(id = "tinymce")
     private WebElement descriptionTextArea;
 
-    @FindBy(css = "[class='btn-group pull-right'] > button")
-    private WebElement saveAndClose;
-
     @FindBy(xpath = "(//div[@class='control-label'])[1]")
     private WebElement generalInfoTitle;
 
     @FindBy(xpath = "//label[text()='Description']/following-sibling::div//div")
     private WebElement generalInfoDescription;
 
-    public void enterCalendarEventTitle(String titleValue){
+    @FindBy(xpath = "//*[contains(text(),'View per page:')]/following-sibling::*//a")
+    private List<WebElement> viewPerPageElements;
+
+    @FindBy(css = "button[class*='btn dropdown-toggle']")
+    private WebElement viewPerPageToggle;
+
+    public List<String> getViewPerPageOptions() {
         BrowserUtilities.waitForPageToLoad(20);
-        wait.until(ExpectedConditions.visibilityOf(title)).sendKeys(titleValue);
-        BrowserUtilities.wait(3);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[title='Create Calendar event']")));
+        viewPerPageToggle.click();
+        BrowserUtilities.wait(2);
+        return BrowserUtilities.getTextFromWebElements(viewPerPageElements);
     }
 
-    public void enterCalendarEventDescription(String description){
+    public void enterCalendarEventTitle(String titleValue) {
         BrowserUtilities.waitForPageToLoad(20);
+        BrowserUtilities.wait(2);
+        wait.until(ExpectedConditions.visibilityOf(title)).sendKeys(titleValue);
+        wait.until(ExpectedConditions.attributeToBe(title, "value", titleValue));
+    }
+
+    public void enterCalendarEventDescription(String description) {
+        //wait until frame is available and switch to it
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(descriptionFrame));
         descriptionTextArea.sendKeys(description);
-        driver.switchTo().defaultContent();
+        wait.until(ExpectedConditions.textToBePresentInElement(descriptionTextArea, description));
+        driver.switchTo().defaultContent();//exit from the frame
     }
 
-    public void clickOnSaveAndClose(){
-        BrowserUtilities.clickWithJS(saveAndClose);
-        // Or saveAndClose.click();
-    }
-
-    public String getGeneralInfoTitleText(){
+    public String getGeneralInfoTitleText() {
         BrowserUtilities.waitForPageToLoad(20);
         return generalInfoTitle.getText();
     }
@@ -79,7 +86,8 @@ public class CalendarEventsPage extends AbstractPageBase {
         return generalInfoDescription.getText();
     }
 
-    public List<String> getColumnNames(){
+    //#############################################################
+    public List<String> getColumnNames() {
         BrowserUtilities.waitForPageToLoad(20);
         return BrowserUtilities.getTextFromWebElements(columnNames);
     }

@@ -23,6 +23,15 @@ public abstract class AbstractPageBase {
     @FindBy(css="#user-menu >a")
     protected WebElement currentUser;
 
+    @FindBy(css = "[class='btn-group pull-right'] > button")
+    protected WebElement saveAndClose;
+
+    public void clickOnSaveAndClose() {
+        BrowserUtilities.wait(3);
+        wait.until(ExpectedConditions.elementToBeClickable(saveAndClose)).click();
+        waitForLoaderMask();
+    }
+
     public AbstractPageBase(){
         PageFactory.initElements(driver,this);
     }
@@ -44,7 +53,12 @@ public abstract class AbstractPageBase {
         BrowserUtilities.wait(3);
         actions.moveToElement(tabElement).pause(2000).click(moduleElement).build().perform();
         BrowserUtilities.wait(4);
+        waitForLoaderMask();
 
+    }
+
+    public void waitForLoaderMask(){
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("[class*='loader-mask']")));
     }
 
 
